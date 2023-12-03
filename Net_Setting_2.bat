@@ -1,6 +1,6 @@
 @echo off
 
-::�Ǘ��Ҍ����֏��i
+::管理者権限へ昇格
 
 
 whoami /priv | find "SeDebugPrivilege" > nul
@@ -10,55 +10,57 @@ exit
 )
 
 
-::IPv4�A�h���X�ݒ��DHCP�ɕύX
+::IPv4アドレス設定をDHCPに変更
 
 
 :dhcp
 
-netsh interface ipv4 set address "�C�[�T�l�b�g" dhcp
+netsh interface ipv4 set address "イーサネット" dhcp
 
 if %ERRORLEVEL% == 0 (goto dhcp2)
 
-for /f "usebackq delims=" %%A in (`netsh interface ipv4 set address "�C�[�T�l�b�g" dhcp`) do set ENABLE=%%A
+for /f "usebackq delims=" %%A in (`netsh interface ipv4 set address "イーサネット" dhcp`) do set ENABLE=%%A
 
-if "%ENABLE%" == "DHCP �͂��̃C���^�[�t�F�C�X�Ŋ��ɗL���ł��B" (goto dhcp2)
+if "%ENABLE%" == "DHCP はこのインターフェイスで既に有効です。" (goto dhcp2)
 
-echo IP�A�h���X�����擾�ݒ肪����Ɋ������܂���ł����B�ēx���s���Ă��������B
+echo IPアドレス自動取得設定が正常に完了しませんでした。再度実行してください。
 pause
 goto dhcp
 
 
-::DNS��DHCP�Ŏ擾
+::DNSをDHCPで取得
 
 
 :dhcp2
-netsh interface ipv4 set dns "�C�[�T�l�b�g" dhcp
+netsh interface ipv4 set dns "イーサネット" dhcp
 
 if %ERRORLEVEL% == 0 (goto next)
 
-echo DNS�����擾�ݒ肪����Ɋ������܂���ł����B�ēx���s���Ă��������B
+echo DNS自動取得設定が正常に完了しませんでした。再度実行してください。
 pause
 goto dhcp2
 
 :next
 
-echo DHCP�̐ݒ�͐���Ɋ������Ă���܂��B
+echo DHCPの設定は正常に完了しております。
 
 
-::�����l�b�g���[�N�̑a�ʊm�F�����ϐ�HOST1�Ƀz�X�g����ݒ�
+::環境変数の設定※環境変数HOST1に内側の疎通確認を行う際のホスト名を設定
 
 
 set COUNT=0
-set DEG=���
+set DEG=回目
 set TIMEOUTCOUNT=15
 set INTERVAL=1
-set HOST1=<<�C�ӂ̃T�[�o�ȂǁA�����l�b�g���[�N�ŒʐM�m�F���\�ł���z�X�g���w��>>
+set HOST1=<<任意のサーバなど、内部ネットワークで通信確認が可能であるホストを指定>>
 set HOST2=yahoo.co.jp
+
+::内部ネットワークの疎通確認
 
 :error1
 timeout /t %INTERVAL%  > nul
 set /a COUNT=COUNT+1
-echo %HOST1%��ICMP�p�P�b�g�𑗐M���Ă��܂�....%COUNT%%DEG%
+echo %HOST1%へICMPパケットを送信しています....%COUNT%%DEG%
 if "%COUNT%" == "%TIMEOUTCOUNT%" goto errortimeout1
 ping -n 1 %HOST1% | find "ms TTL=" > NUL
 if %ERRORLEVEL% == 1 (goto error1)
@@ -66,7 +68,7 @@ if %ERRORLEVEL% == 1 (goto error1)
 echo;
 echo;
 
-echo %HOST1%�ւ̐ڑ��m�F���ł��܂���
+echo %HOST1%への接続確認ができました
 goto end1
 
 echo;
@@ -75,11 +77,11 @@ echo;
 :errortimeout1
 echo;
 echo;
-echo %HOST1%�ւ̐ڑ��m�F���ł��܂���ł���(�Г��l�b�g���[�N�j
+echo %HOST1%への接続確認ができませんでした(社内ネットワーク）
 echo;
 echo;
-echo �l�b�g���[�N�ݒ�󋵂��m�F���āA�ēx�ڑ��m�F���Ă�������
-echo Enter�������ƍēx�ڑ��m�F���ł��܂�
+echo ネットワーク設定状況を確認して、再度接続確認してください
+echo Enterを押すと再度接続確認ができます
 pause
 set COUNT=0
 goto error1
@@ -90,7 +92,7 @@ echo;
 echo;
 
 
-::�O���l�b�g���[�N�̑a�ʊm�F��yahoo.co.jp�Ŋm�F
+::外部ネットワークの疎通確認※yahoo.co.jpで確認
 
 
 set COUNT=0
@@ -98,7 +100,7 @@ set COUNT=0
 :error2
 timeout /t %INTERVAL%  > nul
 set /a COUNT=COUNT+1
-echo %HOST2%��ICMP�p�P�b�g�𑗐M���Ă��܂�....%COUNT%%DEG%
+echo %HOST2%へICMPパケットを送信しています....%COUNT%%DEG%
 if "%COUNT%" == "%TIMEOUTCOUNT%" goto errortimeout2
 ping -n 1 %HOST2% | find "ms TTL=" > NUL
 if %ERRORLEVEL% == 1 (goto error2)
@@ -106,17 +108,17 @@ if %ERRORLEVEL% == 1 (goto error2)
 echo;
 echo;
 
-echo %HOST2%�ւ̐ڑ��m�F���ł��܂���
+echo %HOST2%への接続確認ができました
 goto end2
 
 :errortimeout2
 echo;
 echo;
-echo %HOST2%�ւ̐ڑ��m�F���ł��܂���ł���(�ЊO�l�b�g���[�N�j
+echo %HOST2%への接続確認ができませんでした(社外ネットワーク）
 echo;
 echo;
-echo �l�b�g���[�N�ݒ�󋵂��m�F���āA�ēx�ڑ��m�F���Ă�������
-echo Enter�������ƍēx�ڑ��m�F���ł��܂�
+echo ネットワーク設定状況を確認して、再度接続確認してください
+echo Enterを押すと再度接続確認ができます
 pause
 set COUNT=0
 goto error2
@@ -124,7 +126,7 @@ goto error2
 :end2
 
 
-::���ϐ��̏��������K�v�Ȃ������̌�Ƀv���O������ǉ�����ꍇ�Ȃǂɗ��p
+::環境変数の初期化※必要ないがこの後にプログラムを追加する場合などに利用
 
 
 set ENABLE=
@@ -136,7 +138,7 @@ set HOST1=
 set HOST2=
 echo;
 echo;
-echo DHCP�̕ύX�A�ʐM�m�F�������܂����B
+echo DHCPの変更、通信確認完了しました。
 echo;
 pause
 del /s /q "%USERPROFILE%\Net_Setting_2.bat"
