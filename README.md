@@ -21,4 +21,5 @@
 <br>
 
 ## Net_Setting_2.bat
-<li>
+<li>設定順序は下記の通り
+<oi>
