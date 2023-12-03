@@ -1,6 +1,6 @@
 @echo off
 
-:ŠÇ—ŽÒŒ ŒÀ‚Ö¸Ši
+:ç®¡ç†è€…æ¨©é™ã¸æ˜‡æ ¼
 
 whoami /priv | find "SeDebugPrivilege" > nul
 if %errorlevel% neq 0 (
@@ -9,11 +9,11 @@ exit
 )
 
 
-:ƒ[ƒJƒ‹‚ÖŽÀsƒtƒ@ƒCƒ‹ƒRƒs[•ƒy[ƒXƒg
+:"Net_Setting_2.bat"ã‚’ãƒ­ãƒ¼ã‚«ãƒ«ã¸ã‚³ãƒ”ãƒ¼ï¼†ãƒšãƒ¼ã‚¹ãƒˆ
 
-xcopy /d "<<ŽÀsƒtƒ@ƒCƒ‹ƒpƒX–¼>>" "%USERPROFILE%"
+xcopy /d "<<Net_Setting_2.batã‚’é…ç½®ã—ã¦ã„ã‚‹ãƒ‘ã‚¹>>" "%USERPROFILE%"
 
 
-:ƒlƒbƒgƒ[ƒNÝ’è•ÏXƒtƒ@ƒCƒ‹‚ÌŽÀs¦uNet_Setting_2.batv‚ð”CˆÓ‚ÌêŠ‚É”z’u
+:ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯è¨­å®šå¤‰æ›´ãƒ•ã‚¡ã‚¤ãƒ«ã®å®Ÿè¡Œ
 
 call "%USERPROFILE%\Net_Setting_2.bat"
